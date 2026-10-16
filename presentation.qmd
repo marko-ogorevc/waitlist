@@ -90,13 +90,13 @@ This concerns the *observed differentiation* of access.
 Keep these constructs separate. Changes in assignment quality cannot be inferred from administrative urgency shares alone.
 :::
 
-## Evidence | What reduces waiting times? {.smaller}
+## Evidence \| What reduces waiting times? {.smaller}
 
 | Intervention | Findings from the literature | What policymakers can do |
-|:--|:--|:--|
+|:-----------------------|:-----------------------|:-----------------------|
 | **Protected capacity for new patients** | Systematic review reports shorter waits across outpatient/community settings (Noeske et al., 2026). | Estimate new-referral demand; protect first-visit capacity and review it regularly. |
 | **STAT: demand-management model** | Statewide observational evaluation reports mean waiting time falling from **3.9 to 2.6 months** (Noeske et al., 2026). | Support backlog audits, training and a structured implementation programme. |
-| **Advanced/Open Access** | 8/8 studies measuring third-next-available appointment improved, but only **2/8 reached <48 hours** (Rose et al., 2011). | Balance demand with capacity; monitor implementation quality, not just the launch. |
+| **Advanced/Open Access** | 8/8 studies measuring third-next-available appointment improved, but only **2/8 reached \<48 hours** (Rose et al., 2011). | Balance demand with capacity; monitor implementation quality, not just the launch. |
 
 **Practical message:** protect access for *new* patients while managing existing backlogs and ongoing demand.
 
@@ -104,9 +104,9 @@ Keep these constructs separate. Changes in assignment quality cannot be inferred
 Allow approximately 1.5–2 minutes. Protected appointments reserve part of actual clinical capacity for incoming referrals rather than allocating every future slot in advance. The 2026 Noeske systematic review is intervention evidence across heterogeneous settings; it should not be interpreted as a guaranteed effect size for Slovenia. The statewide STAT result is observational, not a randomized estimate: a decrease from 3.9 to 2.6 months is approximately 33%, but selection and concurrent organizational changes may contribute. Rose and colleagues reviewed 24 implementations, with generally lower wait times but limited attainment of same-day access. National policy can make implementation possible; providers must adapt appointment templates and clinical pathways.
 :::
 
-## Evidence | Where good ideas fall short {.smaller}
+## Evidence \| Where good ideas fall short {.smaller}
 
-:::::: columns
+::::: columns
 ::: {.column width="50%"}
 ### Guidelines are not self-enforcing
 
@@ -124,7 +124,7 @@ Lewis et al. (2018): health benefits of earlier access **vary by service and out
 
 **Policy response:** assess equity, continuity and patient outcomes alongside waiting time.
 :::
-::::::
+:::::
 
 **Failure modes to anticipate:** incomplete adoption · capacity constraints · local workarounds · poor measurement.
 
@@ -132,9 +132,9 @@ Lewis et al. (2018): health benefits of earlier access **vary by service and out
 Allow approximately 1.5–2 minutes. Distinguish a policy failing to achieve a target from proof that the underlying approach cannot work. Johar's Australian analysis warns that guidelines alone do not constrain provider behavior. Rose finds shorter appointment waits without consistently achieving 48-hour access, and mixed satisfaction. Lewis reviews health outcomes of faster outpatient/community care: a day of delay does not have a uniform clinical cost. Evaluate each proposed intervention with an explicit counterfactual where feasible and pre-specified balancing indicators, including continuity and case-mix shifts.
 :::
 
-## Evidence | Prioritization and adaptive capacity {.smaller}
+## Evidence \| Prioritization and adaptive capacity {.smaller}
 
-:::::: columns
+::::: columns
 ::: {.column width="50%"}
 ### Make prioritization auditable
 
@@ -154,7 +154,7 @@ Allow approximately 1.5–2 minutes. Distinguish a policy failing to achieve a t
 
 **Evidence:** principally modelling/optimization; field impact remains to be established.
 :::
-::::::
+:::::
 
 **A digital queue is not an access-management system unless its signals change decisions.**
 
@@ -162,10 +162,10 @@ Allow approximately 1.5–2 minutes. Distinguish a policy failing to achieve a t
 Allow 1.5 minutes. Clinical prioritization and capacity allocation are distinct decision layers. The literature on triage tools includes psychometric validation and implementation barriers; a validated score does not necessarily shorten waiting times. Powers and van der Vlugt are useful for designing prospective policy experiments, not evidence that a nationwide real-world deployment would deliver the simulated benefit. Avoid claiming that observed priority inflation means inappropriate clinical upcoding. Our study examines administrative labels and realized waits, not patient-level need.
 :::
 
-## Policy playbook | Who can act, and how? {.smaller}
+## Policy playbook \| Who can act, and how? {.smaller}
 
 | Level | Implementable measure | How to evaluate |
-|:--|:--|:--|
+|:-----------------------|:-----------------------|:-----------------------|
 | **National authority** | Common wait definitions, quality rules, priority audit standards | Missing/invalid data, cross-provider comparability |
 | **Commissioner / network** | Target support to specialties with persistent demand–capacity imbalance | Referrals, completions, backlog, spillovers |
 | **Provider** | Pilot protected first-visit slots and structured backlog reduction | Time to first visit, third-next-available slot, continuity |
@@ -178,9 +178,9 @@ Allow 1.5 minutes. Clinical prioritization and capacity allocation are distinct 
 Spend about 2 minutes here. These are proposed implementation steps inferred from the literature, not a tested national programme. The national level should define metrics and audit safeguards but cannot optimize each provider's appointment template. Provider and network teams should first quantify incoming demand, backlog and effective clinical capacity. Use a controlled or stepped rollout where realistic, with safeguards for clinically urgent cases. Define balancing measures in advance: follow-up displacement, worsening cases, staff workload, no-shows and data completeness. Decisions should be reversible when evaluation signals harm.
 :::
 
-## Research gap | What our data can add {.smaller}
+## Research gap \| What our data can add {.smaller}
 
-:::::: columns
+::::: columns
 ::: {.column width="48%"}
 ### What existing evidence examines
 
@@ -196,7 +196,7 @@ Spend about 2 minutes here. These are proposed implementation steps inferred fro
 - Do urgency groups retain **relative realized-wait differentiation**?
 - How do within-provider short-run associations compare with long-run patterns?
 :::
-::::::
+:::::
 
 **We measure the functioning of prioritization in observed access—not clinical appropriateness or a causal effect of urgency labels.**
 
@@ -236,7 +236,7 @@ These are provider–health service–month–priority aggregated means, not ind
 - Monthly waiting-list stocks, new registrations, completed services and realized waiting times.
 - Matched **provider × health service** comparisons: Jan–Sep 2020 versus Jan–Sep 2026.
 - Robustness: at least **10 per priority per month** or **50 per priority per quarter**; common matched samples.
-- Quarterly provider–VZS and calendar-quarter fixed effects; standard errors clustered by provider–VZS.
+- Quarterly provider–service and calendar-quarter fixed effects; standard errors clustered by provider–service.
 
 <small>Physiotherapy excluded because changes in electronic referral coverage may distort trends. Realized means are weighted by completed services.</small>
 
@@ -270,9 +270,9 @@ Waiting-list shares reflect stock, which depends on both entries and departures;
 ::: {.column width="38%"}
 ### 715 / 769
 
-**93.0%** of comparable VZS had an increase in highest-urgency waiting-list share.
+**93.0%** of comparable services had an increase in highest-urgency waiting-list share.
 
-At provider–VZS level: **3,001 / 3,416 (87.9%)** increased.
+At provider–service level: **3,001 / 3,416 (87.9%)** increased.
 :::
 
 ::: {.column width="62%"}
@@ -408,7 +408,7 @@ Negative ratio association (beta −0.0151, p \< .001) decomposes into urgent �
 ```{r}
 #| label: tbl-panel-specifications
 #| results: asis
-#| tbl-cap: "Quarterly provider–VZS fixed-effects models; outcome: log(Urgent / Routine realized wait)."
+#| tbl-cap: "Quarterly provider–service fixed-effects models; outcome: log(Urgent / Routine realized wait)."
 # Dynamically read the estimates from the locally fitted fixest models.
 # Every model is estimated on the identical lag-available sample.
 models_for_slide <- list(
@@ -525,7 +525,7 @@ Future phase: scenario simulation or digital twins when data quality, governance
 Limitations: selection of higher-volume provider–service cells, reporting changes, zero-wait exclusion, case mix and simultaneity. The study motivates monitored action rather than proving inappropriate triage.
 :::
 
-## References | Prioritization and equity {.smaller}
+## References \| Prioritization and equity {.smaller}
 
 - Curtis, A. J., Russell, C. O. H., Stoelwinder, J. U., & McNeil, J. J. (2010). Waiting lists and elective surgery: Ordering the queue. *Medical Journal of Australia, 192*(4), 217–220.
 - Johar, M. (2014). *Are waiting list prioritisation guidelines being followed in Australia?* Manuscript version in the literature archive; publication details to verify.
@@ -538,7 +538,7 @@ Limitations: selection of higher-volume provider–service cells, reporting chan
 These references concern how urgency priorities are assigned and standardized, and whether tools translate into better access. Incomplete entries are clearly marked for bibliographic verification; do not cite unverified publication metadata in a manuscript.
 :::
 
-## References | Access interventions and outcomes {.smaller}
+## References \| Access interventions and outcomes {.smaller}
 
 - Murray, M., & Berwick, D. M. (2003). Advanced access: Reducing waiting and delays in primary care. *JAMA, 289*(8), 1035–1040.
 - Rose, K. D., Ross, J. S., & Horwitz, L. I. (2011). Advanced access scheduling outcomes: A systematic review. *Archives of Internal Medicine, 171*(13), 1150–1159. https://doi.org/10.1001/archinternmed.2011.168
@@ -546,7 +546,7 @@ These references concern how urgency priorities are assigned and standardized, a
 - Noeske, K. E., et al. (2026). Statewide scale-up of a demand management model reduced waiting times in community health: A RE-AIM evaluation. *Health & Social Care in the Community*, article 1116924. https://doi.org/10.1155/hsc/1116924
 - Lewis, A. K., et al. (2018). Reducing wait time from referral to first visit for community outpatient services may contribute to better health outcomes: A systematic review. *BMC Health Services Research, 18*, 869. https://doi.org/10.1186/s12913-018-3669-6
 
-## References | Adaptive management and technology {.smaller}
+## References \| Adaptive management and technology {.smaller}
 
 - Powers, J., et al. (2023). Managing surgical waiting lists through dynamic priority scoring. *Health Care Management Science, 26*, 533–557. https://doi.org/10.1007/s10729-023-09648-1
 - van der Vlugt, Y. M., van Essen, J. T., Vromans, R. F. M., & Carlier, M. (2024). *Timeslot allocation for waiting list control*. arXiv:2410.10221.
