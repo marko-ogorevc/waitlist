@@ -1,35 +1,52 @@
-# 01_priority_inflation.R
-# Run AFTER sourcing `import waitlist data NIJZ.R` locally.
-# Uses only local NIJZ_db; no raw data is uploaded to GitHub.
-# Outputs in local results/ and figures/ (review before publication).
+# =============================================================================
+# WAITING LISTS: PRIORITY INFLATION AND ACCESS INDICATORS
+# =============================================================================
+# Input: NIJZ_db, created locally by 'import waitlist data NIJZ.R'.
+# Period: all available months (currently January 2020–September 2026).
+# Unit of observation: VZS x provider x month x priority x measure.
+# Source data remain local; commit only code or reviewed aggregate outputs.
+#
+# ANALYTICAL SAMPLE
+# - First consultations, diagnostics, and therapeutic procedures.
+# - Excludes control consultations, start-of-treatment codes and physiotherapy.
+#   This is an intentional sample definition, not all monitored services.
+# - Waiting-list entries are not necessarily unique individuals.
+#
+# INTERPRETATION / DATA QUALITY
+# - 'Čakajoči VSI': end-of-month waiting-list stock.
+# - 'Vpisani': monthly new registrations (flow).
+# - 'Realizirani': completed services (flow).
+# - 'ČD realizirana': provider-level mean realized waiting time.
+# - 'ČD prvi termin': monthly mean of daily reported first/indicative dates.
+#   Actual available dates and indicative dates cannot be separated here.
+# - NA may represent zero activity or missing reporting; summations with
+#   na.rm = TRUE are retained from the exploratory analysis and need a
+#   missingness sensitivity check before publication.
+# - A reporting-definition break affects 'Čakajoči NAD' in August 2024;
+#   this script does not use that measure.
+# - Administrative urgency-code reporting anomalies remain possible.
+# - Descriptive associations / fixed-effects regressions do NOT establish
+#   inappropriate triage or a causal effect on waiting times.
+#
+# SECTION INDEX
+# 1. Sample and priority composition
+# 2. Realized waiting times and relative/absolute gaps
+# 3. Reported appointment waits and comparison
+# 4. Priority inflation across VZS and providers
+# 5. Exploratory fixed-effects models
+# =============================================================================
 
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(readr)
-library(scales)
+library(fixest)
 
 extrafont::loadfonts()
-f_family = "Poppins"
+f_family <- "Poppins"
 
 stopifnot(exists("NIJZ_db"))
 
-dir.create("results", showWarnings = FALSE)
-dir.create("figures", showWarnings = FALSE)
-
-# Important methodological choices:
-# - 'Čakajoči VSI' = waiting-list STOCK at end of month.
-# - 'Realizirani' = monthly activity FLOW.
-# - NA may mean zero or unavailable: keep NA distinct from zero.
-# - These are observational indicators, not causal evidence of priority erosion.
-# - 2020–2025 is the abstract's study period; 2026 can be studied separately.
-# - Aug 2024 changed the operational definition of 'Čakajoči NAD';
-#   never pool its values across that break as a methodologically stable series.
-# - Do not calculate national mean waiting times by simply averaging
-#   provider-level means; weight by corresponding realized counts after
-#   verifying exactly aligned definitions and observation coverage.
-
-
+# 1. ANALYTICAL SAMPLE AND PRIORITY COMPOSITION ------------------------------
 priority_data <- NIJZ_db |> 
   filter(
      TIP_VZS %in% c(
@@ -41,7 +58,7 @@ priority_data <- NIJZ_db |>
     !grepl("fizioterapevtska", `VZS naziv`, ignore.case = TRUE)
   )
 
-# chart waiting list ####
+# 1.1 Waiting-list stock: monthly urgency shares -------------------------------
 overview_chart_wait_all <- 
   priority_data %>%
   
@@ -120,7 +137,7 @@ overview_chart_wait_all <-
   )
 
 
-# chart realizied ####
+# 1.2 Completed services: monthly urgency shares -------------------------------
 overview_chart_realized <- 
   priority_data %>%
   
@@ -198,7 +215,10 @@ overview_chart_realized <-
     caption = "Source: The National Institute of Public Health (NIJZ), 2026.\nVisualization: Dr. Marko Ogorevc (IER, DZIIZ)"
   )
 
-# wating times ####
+# 2. REALIZED WAITING TIMES ----------------------------------------------------
+# Include provider name in the key: RIZDDZ code alone is not unique enough.
+# Provider-level averages must be weighted by their corresponding completed
+# services (Realizirani) before aggregating by service type and urgency.
 
 waiting_times <- priority_data |>
   filter(var %in% c("ČD realizirana", "Realizirani")) |>
@@ -212,6 +232,9 @@ waiting_times <- priority_data |>
   )
 
 
+# 2.1 Data-quality check: negative and zero realized waiting times ------------
+# Negative durations are invalid. Zero durations can be legitimate, but this
+# exploratory analysis excludes both and should be checked for sensitivity.
 waiting_times |>
   summarise(
     n_negative = sum(`ČD realizirana` < 0, na.rm = TRUE),
@@ -246,6 +269,7 @@ waiting_times |>
   geom_line(aes(color = status, lty = priority))
 
 
+# 2.2 Weighted monthly means --------------------------------------------------
 waiting_times_valid <- waiting_times |>
   filter(
     !is.na(`ČD realizirana`),
@@ -266,6 +290,7 @@ waiting_times_monthly <- waiting_times_valid |>
   )
 
 
+# 2.3 Chart: weighted realized waiting times ---------------------------------
 overview_chart_waiting_times <- 
   waiting_times_monthly %>%
   
@@ -287,11 +312,6 @@ overview_chart_waiting_times <-
   )+
   
   geom_line(aes(color = priority_eng))+
-  # geom_text(aes(color = priority_eng, 
-  #               label = ifelse(date %in% c(min(date), max(date)),
-  #                              scales::percent(value, big.mark = ",", decimal.mark =".", accuracy = 0.1),
-  #                              NA_character_)),
-  #           show.legend = FALSE)+
   theme_minimal()+
   scale_color_manual(
     values = c("#cd403b", "#748394", "#12989c" ), 
@@ -329,7 +349,9 @@ overview_chart_waiting_times <-
     caption = "Source: The National Institute of Public Health (NIJZ), 2026.\nVisualization: Dr. Marko Ogorevc (IER, DZIIZ)"
   )
 
-# razmerje ####
+# 2.4 Chart: urgent / routine realized-wait ratio ------------------------------
+# A rising ratio toward 1 signals less relative differentiation, not
+# necessarily deterioration in absolute urgency advantage.
 
 (
   overview_chart_priority_erosion <-
@@ -439,8 +461,8 @@ overview_chart_waiting_times <-
 )
 
 
-# 
-
+# 2.5 Chart: routine minus urgent gap in days ---------------------------------
+# Absolute and relative gaps may move in opposite directions.
 (
   overview_chart_waiting_time_gap <-
     waiting_times_monthly %>%
@@ -545,8 +567,11 @@ overview_chart_waiting_times <-
 )
 
 
-# 
-
+# 3. REPORTED FIRST / INDICATIVE APPOINTMENT WAIT -----------------------------
+# The published monthly number is an average of daily dates posted by each
+# provider and VZS, mixing actual first available and indicative appointments.
+# Vpisani is an enrollment-weight used as a proxy; this does NOT estimate
+# patient-experienced waiting time.
 first_appointment <- priority_data |>
   filter(var %in% c("ČD prvi termin", "Vpisani")) |>
   select(
@@ -584,7 +609,8 @@ first_appointment_monthly <- first_appointment |>
 
 
 (
-  overview_chart_first_appointment <-
+  # 3.1 Chart: enrollment-weighted reported appointment wait ------------------
+overview_chart_first_appointment <-
     first_appointment_monthly %>%
     
     filter(
@@ -681,9 +707,8 @@ first_appointment_monthly <- first_appointment |>
 )
 
 
-# ####
-
-
+# 3.2 Chart: realized versus reported waiting times, urgent only --------------
+# Distinct definitions and distinct weights: diagnostic comparison only.
 (
   overview_chart_waiting_times_comparison <-
     
@@ -800,8 +825,9 @@ first_appointment_monthly <- first_appointment |>
 )
 
 
-# ####
-
+# 4. PRIORITY INFLATION ACROSS HEALTHCARE SERVICES ---------------------------
+# End-of-month stock; service-month proportions of 'Zelo hitro'.
+# Months with no waiting entries have undefined shares and are excluded.
 priority_vzs <- priority_data |>
   filter(var == "Čakajoči VSI") |>
   group_by(date, `VZS šifra`, TIP_VZS, priority) |>
@@ -830,6 +856,9 @@ priority_vzs |>
     missing_shares = sum(is.na(share))
   )
 
+# 4.1 Comparable VZS: January–September 2020 versus 2026 ---------------------
+# At least six months with positive waiting-list totals in EACH period.
+# Period shares are ratios of summed monthly counts, not simple monthly means.
 priority_vzs_comparison <- priority_vzs |>
   filter(
     lubridate::year(date) %in% c(2020, 2026),
@@ -867,6 +896,7 @@ priority_vzs_comparison |>
     pct_increased = mean(change_pp > 0) * 100
   )
 
+# 4.2 Histogram: percentage-point changes across VZS ------------------------
 (
   priority_inflation_distribution <-
     priority_vzs_comparison |>
@@ -909,6 +939,7 @@ priority_vzs_comparison |>
 )
 
 
+# 4.3 Robustness: grouping by minimum mean stock in the two periods ----------
 priority_vzs_comparison |>
   mutate(
     size = pmin(avg_waiting_2020, avg_waiting_2026),
@@ -933,8 +964,8 @@ priority_vzs_comparison |>
   )
 
 
-# #####
-
+# 4.4 Stable provider–VZS pairs ------------------------------------------------
+# Use RIZDDZ code AND provider name. Renamed providers may fail to match.
 priority_provider <- priority_data |>
   filter(
     var == "Čakajoči VSI",
@@ -1032,8 +1063,10 @@ priority_provider_comparison |>
   )
 
 
-# ####
-
+# 5. EXPLORATORY FIXED-EFFECTS REGRESSIONS ----------------------------------
+# Outcome: log(1 + mean realized wait), urgent category; VZS and date FE.
+# Standard errors clustered by VZS. Models are ASSOCIATIONAL, not causal.
+# Means exclude zero / negative durations; evaluate selection and missingness.
 waiting_times_vzs <- waiting_times_valid |>
   filter(priority == "Zelo hitro") |>
   group_by(date, `VZS šifra`) |>
@@ -1098,10 +1131,7 @@ priority_erosion_data |>
   )
 
 
-# panel model ####
-
-# install.packages("fixest")
-library(fixest)
+# 5.1 Model 1: contemporaneous urgent share in waiting-list stock -------------
 
 panel_data <- priority_erosion_data |>
   filter(
@@ -1115,8 +1145,7 @@ panel_data <- priority_erosion_data |>
   ungroup() |>
   mutate(
     log_wait = log1p(mean_wait),
-    share_urgent_pp = share * 100,
-    month = factor(date)
+    share_urgent_pp = share * 100
   )
 
 model_1 <- feols(
@@ -1128,6 +1157,9 @@ model_1 <- feols(
 summary(model_1)
 
 
+# 5.2 New registrations (flow) and month-lag construction --------------------
+# Calendar month ID prevents a missing month from being treated as the
+# previous month's observation. Lagged share remains observational.
 priority_new <- priority_data |>
   filter(var == "Vpisani") |>
   group_by(date, `VZS šifra`, TIP_VZS, priority) |>
@@ -1190,6 +1222,9 @@ panel_new |>
   )
 
 
+# 5.3 Model 2: urgent share among new registrations, lagged one month --------
+# The two models currently use different estimation samples; coefficients
+# should not be compared as if they had identical observations.
 panel_new_model <- panel_new |>
   filter(
     !is.na(share_new_lag1),
