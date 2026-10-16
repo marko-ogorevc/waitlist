@@ -351,8 +351,6 @@ NIJZ_db <-
   ) 
 
 
-glimpse(NIJZ_db)
-
 
 nijz_var_prior<-
   NIJZ_db |> 
@@ -417,14 +415,11 @@ NIJZ_db <-
     "VZS naziv" = "Naziv VZS",
     "TIP_VZS",
     "RIZDDZ šifra izvajalca",
+    "Naziv izvajalca",
     "var",
     "priority",
     "value"
   )
 
-
-NIJZ_db |>
-  distinct(`VZS šifra`, TIP_VZS) |>
-  count(TIP_VZS, sort = TRUE)
 
 
