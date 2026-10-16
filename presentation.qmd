@@ -108,9 +108,9 @@ Quarterly provider–VZS fixed-effects analysis, **8,759 observations**; provide
 
 | Outcome | Coefficient per 1 pp increase in new urgent share |
 |:--|--:|
-| log(Urgent / Routine realized wait) | **−0.0151*** |
-| log(Urgent realized wait) | **−0.0036** |
-| log(Routine realized wait) | **+0.0115*** |
+| log(Urgent / Routine realized wait) | −0.0151 (p < 0.001) |
+| log(Urgent realized wait) | −0.0036 (p < 0.01) |
+| log(Routine realized wait) | +0.0115 (p < 0.001) |
 
 - Higher contemporaneous urgent registration shares are associated with **greater relative urgent advantage**, mainly through longer routine waits.
 - Associations persist in direction after adjusting for new registration and completion volumes; no causal interpretation.
