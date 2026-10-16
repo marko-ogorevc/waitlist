@@ -13,3 +13,20 @@ $presentation-font-size-root: 30px;
 .reveal .slides section { text-align: left; }
 .reveal .footer { font-size: 0.55em; }
 .reveal .callout { font-size: 0.7em; }
+
+/* Compact, legible FE-model table on a 1280x720 Reveal slide. */
+.reveal table.panel-regression {
+  font-size: 0.58em;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.45em;
+}
+.reveal table.panel-regression th,
+.reveal table.panel-regression td {
+  padding: 0.22em 0.38em;
+  white-space: nowrap;
+}
+.reveal table.panel-regression th:first-child,
+.reveal table.panel-regression td:first-child {
+  text-align: left;
+}
