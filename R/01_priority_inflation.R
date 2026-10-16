@@ -33,7 +33,7 @@
 # 2. Realized waiting times and relative/absolute gaps
 # 3. Reported appointment waits and comparison
 # 4. Priority inflation across VZS and providers
-# 5. Exploratory fixed-effects models
+# 5. Provider-level comparison and quarterly panel
 # =============================================================================
 
 library(dplyr)
@@ -1063,190 +1063,249 @@ priority_provider_comparison |>
   )
 
 
-# 5. EXPLORATORY FIXED-EFFECTS REGRESSIONS ----------------------------------
-# Outcome: log(1 + mean realized wait), urgent category; VZS and date FE.
-# Standard errors clustered by VZS. Models are ASSOCIATIONAL, not causal.
-# Means exclude zero / negative durations; evaluate selection and missingness.
-waiting_times_vzs <- waiting_times_valid |>
-  filter(priority == "Zelo hitro") |>
-  group_by(date, `VZS šifra`) |>
+
+# 5. PROVIDER × VZS COMPARISONS: RELATIVE WAITING-TIME DIFFERENTIATION -------
+# Replaces preliminary VZS-only regressions. Unit: provider × service × period.
+# Main pairwise criterion: at least 10 completed services in EACH priority
+# in each included month; at least 6 valid months in Jan–Sep of BOTH years.
+# Sensitivity: >=50 completions in EACH priority per calendar quarter,
+# and >=2 valid quarters in Q1–Q3 of BOTH years.
+# Selected, higher-volume services are not representative of all VZS.
+# Excluding zero mean waits is an analytical choice requiring sensitivity work.
+# Provider names are retained in identifiers; changes of name can break a pair.
+
+provider_panel <- waiting_times_valid |>
+  filter(priority %in% c("Zelo hitro", "Hitro", "Redno")) |>
+  group_by(date, `RIZDDZ šifra izvajalca`, `Naziv izvajalca`,
+           `VZS šifra`, TIP_VZS, priority) |>
   summarise(
-    mean_wait = weighted.mean(
-      `ČD realizirana`,
-      w = Realizirani
-    ),
+    mean_wait = weighted.mean(`ČD realizirana`, Realizirani),
     n_realized = sum(Realizirani),
     .groups = "drop"
-  )
-
-priority_erosion_data <- priority_vzs |>
-  filter(priority == "Zelo hitro") |>
-  select(
-    date, `VZS šifra`, TIP_VZS,
-    share, total_waiting
   ) |>
-  left_join(
-    waiting_times_vzs,
-    by = c("date", "VZS šifra")
-  )
+  pivot_wider(names_from = priority, values_from = c(mean_wait, n_realized))
 
+# Helper: all pairwise comparisons, numerator = more urgent priority.
+make_priority_pairs <- function(wide_data, time_col, min_n) {
+  key_cols <- c(time_col, "RIZDDZ šifra izvajalca",
+                "Naziv izvajalca", "VZS šifra", "TIP_VZS")
+  make_one <- function(label, high, low) {
+    wide_data |>
+      transmute(
+        across(all_of(key_cols)),
+        comparison = label,
+        wait_high = .data[[paste0("mean_wait_", high)]],
+        wait_low = .data[[paste0("mean_wait_", low)]],
+        n_high = .data[[paste0("n_realized_", high)]],
+        n_low = .data[[paste0("n_realized_", low)]]
+      )
+  }
+  bind_rows(
+    make_one("Urgent / Routine", "Zelo hitro", "Redno"),
+    make_one("Semi-urgent / Routine", "Hitro", "Redno"),
+    make_one("Urgent / Semi-urgent", "Zelo hitro", "Hitro")
+  ) |>
+    filter(is.finite(wait_high), is.finite(wait_low),
+           wait_high > 0, wait_low > 0,
+           n_high >= min_n, n_low >= min_n) |>
+    mutate(relative_wait = wait_high / wait_low,
+           absolute_gap = wait_low - wait_high)
+}
 
-priority_erosion_data |>
-  summarise(
-    n = n(),
-    n_vzs = n_distinct(`VZS šifra`),
-    n_missing_wait = sum(is.na(mean_wait)),
-    pct_complete = 100 * mean(!is.na(mean_wait))
-  )
+provider_keys <- c("RIZDDZ šifra izvajalca",
+                   "Naziv izvajalca", "VZS šifra")
 
+# 5.1 Monthly comparison: 2020 vs 2026 --------------------------------------
+priority_pairs <- make_priority_pairs(provider_panel, "date", 10)
 
-waiting_times |>
-  filter(priority == "Zelo hitro") |>
-  mutate(
-    status = case_when(
-      is.na(Realizirani) | Realizirani == 0 ~ "Brez realizacij",
-      is.na(`ČD realizirana`) ~ "Manjkajoča ČD",
-      `ČD realizirana` <= 0 ~ "Neveljavna ali ničelna ČD",
-      TRUE ~ "Veljavni podatki"
+pair_coverage <- priority_pairs |>
+  filter(lubridate::year(date) %in% c(2020, 2026),
+         lubridate::month(date) <= 9) |>
+  mutate(year = lubridate::year(date)) |>
+  count(comparison, across(all_of(provider_keys)), year, name = "n_months") |>
+  filter(n_months >= 6) |>
+  select(-n_months) |>
+  pivot_wider(names_from = year, values_from = year, names_prefix = "year_") |>
+  filter(!is.na(year_2020), !is.na(year_2026))
+
+common_pairs <- pair_coverage |>
+  count(across(all_of(provider_keys)), name = "n_comparisons") |>
+  filter(n_comparisons == 3) |>
+  select(all_of(provider_keys))
+
+# Annual means of provider-level waiting times are weighted by completed care.
+# First aggregate numerator and denominator separately; THEN form their ratio.
+pair_change <- priority_pairs |>
+  semi_join(pair_coverage, by = c("comparison", provider_keys)) |>
+  filter(lubridate::year(date) %in% c(2020, 2026),
+         lubridate::month(date) <= 9) |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(comparison, across(all_of(provider_keys)), year) |>
+  summarise(wait_high = weighted.mean(wait_high, n_high),
+            wait_low = weighted.mean(wait_low, n_low),
+            .groups = "drop") |>
+  mutate(ratio = wait_high / wait_low,
+         gap = wait_low - wait_high) |>
+  select(comparison, all_of(provider_keys), year, ratio, gap) |>
+  pivot_wider(names_from = year, values_from = c(ratio, gap),
+              names_sep = "_") |>
+  mutate(change_ratio = ratio_2026 - ratio_2020,
+         change_gap = gap_2026 - gap_2020)
+
+# Helper for paired comparisons. The signed-rank p-value describes the
+# location shift of the paired DIFFERENCES; it is not a causal test.
+summarise_pair_change <- function(dat) {
+  dat |>
+    group_by(comparison) |>
+    summarise(
+      n = n(),
+      median_2020 = median(ratio_2020),
+      median_2026 = median(ratio_2026),
+      median_change = median(change_ratio),
+      pct_increased = 100 * mean(change_ratio > 0),
+      median_gap_change = median(change_gap),
+      p_value = wilcox.test(change_ratio, mu = 0, exact = FALSE)$p.value,
+      .groups = "drop"
     )
-  ) |>
-  count(status)
+}
+pair_summary <- summarise_pair_change(pair_change)
+pair_summary_common <- pair_change |>
+  semi_join(common_pairs, by = provider_keys) |>
+  summarise_pair_change()
+print(pair_summary)
+print(pair_summary_common)
 
-priority_erosion_data |>
-  filter(
-    !is.na(share),
-    !is.na(mean_wait)
-  ) |>
-  group_by(`VZS šifra`) |>
-  summarise(
-    n_months = n_distinct(date),
-    .groups = "drop"
-  ) |>
-  summarise(
-    n_vzs = n(),
-    median_months = median(n_months),
-    vzs_24m = sum(n_months >= 24),
-    vzs_48m = sum(n_months >= 48),
-    vzs_60m = sum(n_months >= 60)
-  )
+# 5.2 Quarterly sensitivity analysis: >=50 in each priority ------------------
+provider_quarterly <- waiting_times_valid |>
+  filter(priority %in% c("Zelo hitro", "Hitro", "Redno")) |>
+  mutate(quarter = lubridate::floor_date(date, "quarter")) |>
+  group_by(quarter, `RIZDDZ šifra izvajalca`, `Naziv izvajalca`,
+           `VZS šifra`, TIP_VZS, priority) |>
+  summarise(mean_wait = weighted.mean(`ČD realizirana`, Realizirani),
+            n_realized = sum(Realizirani), .groups = "drop") |>
+  pivot_wider(names_from = priority, values_from = c(mean_wait, n_realized))
 
+quarterly_pairs <- make_priority_pairs(provider_quarterly, "quarter", 50)
 
-# 5.1 Model 1: contemporaneous urgent share in waiting-list stock -------------
+quarterly_coverage <- quarterly_pairs |>
+  filter(lubridate::year(quarter) %in% c(2020, 2026),
+         lubridate::quarter(quarter) <= 3) |>
+  mutate(year = lubridate::year(quarter)) |>
+  count(comparison, across(all_of(provider_keys)), year, name = "n_quarters") |>
+  filter(n_quarters >= 2) |>
+  select(-n_quarters) |>
+  pivot_wider(names_from = year, values_from = year, names_prefix = "year_") |>
+  filter(!is.na(year_2020), !is.na(year_2026))
 
-panel_data <- priority_erosion_data |>
-  filter(
-    !is.na(share),
-    !is.na(mean_wait),
-    mean_wait > 0,
-    n_realized > 0
-  ) |>
-  group_by(`VZS šifra`) |>
-  filter(n_distinct(date) >= 48) |>
-  ungroup() |>
-  mutate(
-    log_wait = log1p(mean_wait),
-    share_urgent_pp = share * 100
-  )
+common_quarterly <- quarterly_coverage |>
+  count(across(all_of(provider_keys)), name = "n_comparisons") |>
+  filter(n_comparisons == 3) |>
+  select(all_of(provider_keys))
 
-model_1 <- feols(
-  log_wait ~ share_urgent_pp | `VZS šifra` + date,
-  data = panel_data,
-  vcov = ~ `VZS šifra`
-)
+quarterly_change <- quarterly_pairs |>
+  semi_join(common_quarterly, by = provider_keys) |>
+  filter(lubridate::year(quarter) %in% c(2020, 2026),
+         lubridate::quarter(quarter) <= 3) |>
+  mutate(year = lubridate::year(quarter)) |>
+  group_by(comparison, across(all_of(provider_keys)), year) |>
+  summarise(wait_high = weighted.mean(wait_high, n_high),
+            wait_low = weighted.mean(wait_low, n_low),
+            .groups = "drop") |>
+  mutate(ratio = wait_high / wait_low, gap = wait_low - wait_high) |>
+  select(comparison, all_of(provider_keys), year, ratio, gap) |>
+  pivot_wider(names_from = year, values_from = c(ratio, gap),
+              names_sep = "_") |>
+  mutate(change_ratio = ratio_2026 - ratio_2020,
+         change_gap = gap_2026 - gap_2020)
 
-summary(model_1)
+quarterly_summary <- summarise_pair_change(quarterly_change)
+print(quarterly_summary)
 
-
-# 5.2 New registrations (flow) and month-lag construction --------------------
-# Calendar month ID prevents a missing month from being treated as the
-# previous month's observation. Lagged share remains observational.
-priority_new <- priority_data |>
+# 5.3 Quarterly FE model: new registrations and realized waiting-time ratio --
+# FE: provider–VZS and calendar quarter. Clustered SE: provider–VZS.
+# Contemporaneous share is endogenous to system changes; results describe
+# associations rather than causal capacity reallocation.
+# Denominator checks are advisable: sum(..., na.rm=TRUE) may hide missingness.
+priority_new_quarterly <- priority_data |>
   filter(var == "Vpisani") |>
-  group_by(date, `VZS šifra`, TIP_VZS, priority) |>
-  summarise(
-    n_new = sum(value, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  group_by(date, `VZS šifra`) |>
-  mutate(
-    total_new = sum(n_new),
-    share_new = if_else(
-      total_new > 0,
-      n_new / total_new,
-      NA_real_
-    )
-  ) |>
+  mutate(quarter = lubridate::floor_date(date, "quarter")) |>
+  group_by(quarter, `RIZDDZ šifra izvajalca`, `Naziv izvajalca`,
+           `VZS šifra`, priority) |>
+  summarise(n_new = sum(value, na.rm = TRUE), .groups = "drop") |>
+  group_by(quarter, across(all_of(provider_keys))) |>
+  mutate(total_new = sum(n_new),
+         share_new = if_else(total_new > 0, n_new / total_new, NA_real_)) |>
   ungroup() |>
   filter(priority == "Zelo hitro")
 
-
-panel_new <- priority_new |>
-  select(
-    date, `VZS šifra`, TIP_VZS,
-    share_new, total_new
-  ) |>
+panel_quarterly <- quarterly_pairs |>
+  filter(comparison == "Urgent / Routine") |>
   left_join(
-    waiting_times_vzs,
-    by = c("date", "VZS šifra")
-  )
-
-panel_new <- panel_new |>
-  mutate(
-    month_id = lubridate::year(date) * 12 +
-      lubridate::month(date)
+    priority_new_quarterly |>
+      select(quarter, all_of(provider_keys), share_new, total_new),
+    by = c("quarter", provider_keys)
   ) |>
-  left_join(
-    priority_new |>
-      mutate(
-        month_id = lubridate::year(date) * 12 +
-          lubridate::month(date) + 1
-      ) |>
-      select(
-        `VZS šifra`,
-        month_id,
-        share_new_lag1 = share_new
-      ),
-    by = c("VZS šifra", "month_id")
-  )
-
-panel_new |>
-  summarise(
-    n = n(),
-    n_vzs = n_distinct(`VZS šifra`),
-    complete_current = sum(
-      !is.na(share_new) & !is.na(mean_wait)
-    ),
-    complete_lagged = sum(
-      !is.na(share_new_lag1) & !is.na(mean_wait)
-    )
-  )
-
-
-# 5.3 Model 2: urgent share among new registrations, lagged one month --------
-# The two models currently use different estimation samples; coefficients
-# should not be compared as if they had identical observations.
-panel_new_model <- panel_new |>
-  filter(
-    !is.na(share_new_lag1),
-    !is.na(mean_wait),
-    mean_wait > 0,
-    n_realized > 0,
-    total_new > 0
-  ) |>
-  group_by(`VZS šifra`) |>
-  filter(n_distinct(date) >= 48) |>
-  ungroup() |>
   mutate(
-    log_wait = log1p(mean_wait),
-    share_new_lag1_pp = share_new_lag1 * 100
-  )
+    provider_vzs = interaction(`RIZDDZ šifra izvajalca`,
+                               `Naziv izvajalca`, `VZS šifra`, drop = TRUE),
+    log_ratio = log(relative_wait),
+    share_new_pp = share_new * 100
+  ) |>
+  filter(is.finite(log_ratio), is.finite(share_new_pp), total_new > 0)
 
+# Actual previous CALENDAR quarter, not the previous observed quarter in
+# the filtered panel.
+lagged_registration <- priority_new_quarterly |>
+  mutate(quarter_id = lubridate::year(quarter) * 4 +
+                        lubridate::quarter(quarter) + 1) |>
+  select(quarter_id, all_of(provider_keys),
+         share_new_lag1 = share_new)
 
-model_2 <- feols(
-  log_wait ~ share_new_lag1_pp |
-    `VZS šifra` + date,
-  data = panel_new_model,
-  vcov = ~ `VZS šifra`
+panel_lag_common <- panel_quarterly |>
+  mutate(quarter_id = lubridate::year(quarter) * 4 +
+                        lubridate::quarter(quarter)) |>
+  left_join(lagged_registration,
+            by = c("quarter_id", provider_keys)) |>
+  mutate(share_new_lag1_pp = share_new_lag1 * 100) |>
+  filter(is.finite(share_new_lag1_pp))
+
+model_current <- feols(
+  log_ratio ~ share_new_pp | provider_vzs + quarter,
+  data = panel_lag_common, vcov = ~ provider_vzs
+)
+model_lagged <- feols(
+  log_ratio ~ share_new_lag1_pp | provider_vzs + quarter,
+  data = panel_lag_common, vcov = ~ provider_vzs
+)
+model_combined <- feols(
+  log_ratio ~ share_new_pp + share_new_lag1_pp | provider_vzs + quarter,
+  data = panel_lag_common, vcov = ~ provider_vzs
+)
+# Disaggregating log ratio: coefficient difference should equal ratio effect.
+model_urgent <- feols(
+  log(wait_high) ~ share_new_pp | provider_vzs + quarter,
+  data = panel_lag_common, vcov = ~ provider_vzs
+)
+model_routine <- feols(
+  log(wait_low) ~ share_new_pp | provider_vzs + quarter,
+  data = panel_lag_common, vcov = ~ provider_vzs
 )
 
-summary(model_2)
+# Sensitivity: volumes can themselves respond to prioritization decisions.
+panel_extended <- panel_lag_common |>
+  mutate(log_new = log1p(total_new),
+         log_realized = log1p(n_high + n_low))
+model_extended <- feols(
+  log_ratio ~ share_new_pp + log_new + log_realized |
+    provider_vzs + quarter,
+  data = panel_extended, vcov = ~ provider_vzs
+)
+print(etable(model_current, model_lagged, model_combined,
+             digits = 4, fitstat = ~ n + wr2))
+print(etable(model_urgent, model_routine, model_current,
+             digits = 4, fitstat = ~ n + wr2))
+print(etable(model_current, model_extended,
+             digits = 4, fitstat = ~ n + wr2))
+
+# Slides report previously verified aggregates, NOT raw NIJZ observations.
+# After running locally, compare these outputs to those in presentation.qmd.
