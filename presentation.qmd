@@ -361,7 +361,7 @@ Limitations: selection of higher-volume provider–VZS cells, reporting changes,
 ## Selected references {.smaller}
 
 - Curtis, A. J., Russell, C. O. H., Stoelwinder, J. U., & McNeil, J. J. (2010). Waiting lists and elective surgery: Ordering the queue. *Medical Journal of Australia, 192*(4), 217–220.
-- Johar, M. (2014). Are waiting list prioritisation guidelines being followed in Australia? *Medical Decision Making*. 
+- Johar, M. (2014). *Are waiting list prioritisation guidelines being followed in Australia?* Research manuscript supplied in the literature archive. 
 - Déry, J., et al. (2020). A systematic review of patient prioritization tools in non-emergency healthcare services. *Systematic Reviews, 9*, 227. https://doi.org/10.1186/s13643-020-01482-8
 - Powers, J., et al. (2023). Managing surgical waiting lists through dynamic priority scoring. *Health Care Management Science, 26*, 533–557. https://doi.org/10.1007/s10729-023-09648-1
 - van der Vlugt, Y. M., van Essen, J. T., Vromans, R. F. M., & Carlier, M. (2024). *Timeslot allocation for waiting list control*. arXiv:2410.10221.
