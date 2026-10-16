@@ -93,18 +93,36 @@ overview_chart_wait_all <-
   )+
   
   geom_line(aes(color = priority_eng))+
-  geom_text(aes(color = priority_eng, 
-                label = ifelse(date %in% c(min(date), max(date)),
-                               scales::percent(value, big.mark = ",", decimal.mark =".", accuracy = 0.1),
-                               NA_character_)),
-            show.legend = FALSE)+
+  geom_text(
+    data = \(d) d |>
+      group_by(type, priority_eng) |>
+      filter(date %in% range(date)) |>
+      mutate(
+        label_date = if_else(
+          date == min(date),
+          date - lubridate::days(60),
+          date + lubridate::days(60)
+        ),
+        hjust_label = if_else(date == min(date), 1, 0)
+      ) |>
+      ungroup(),
+    
+    aes(
+      x = label_date,
+      y = value,
+      color = priority_eng,
+      label = scales::percent(value, accuracy = 0.1),
+      hjust = hjust_label
+    ),
+    show.legend = FALSE
+    )+
   theme_minimal()+
   scale_color_manual(
     values = c("#cd403b", "#748394", "#12989c" ), 
     name = element_blank())+
   
   scale_x_date(name = element_blank(), breaks = "2 years", date_labels = "%b\n%Y", 
-               limits = as.Date(c("2019-06-01", "2027-03-31"))) +
+               limits = as.Date(c("2019-01-01", "2027-12-31"))) +
   
   scale_y_continuous(name = element_blank(),
                      labels = function(y)  scales::percent(y, big.mark = ",", decimal.mark =".", accuracy = 0.1), 
@@ -172,18 +190,36 @@ overview_chart_realized <-
   )+
   
   geom_line(aes(color = priority_eng))+
-  geom_text(aes(color = priority_eng, 
-                label = ifelse(date %in% c(min(date), max(date)),
-                               scales::percent(value, big.mark = ",", decimal.mark =".", accuracy = 0.1),
-                               NA_character_)),
-            show.legend = FALSE)+
+  geom_text(
+    data = \(d) d |>
+      group_by(type, priority_eng) |>
+      filter(date %in% range(date)) |>
+      mutate(
+        label_date = if_else(
+          date == min(date),
+          date - lubridate::days(60),
+          date + lubridate::days(60)
+        ),
+        hjust_label = if_else(date == min(date), 1, 0)
+      ) |>
+      ungroup(),
+    
+    aes(
+      x = label_date,
+      y = value,
+      color = priority_eng,
+      label = scales::percent(value, accuracy = 0.1),
+      hjust = hjust_label
+    ),
+    show.legend = FALSE
+  )+
   theme_minimal()+
   scale_color_manual(
     values = c("#cd403b", "#748394", "#12989c" ), 
     name = element_blank())+
   
   scale_x_date(name = element_blank(), breaks = "2 years", date_labels = "%b\n%Y", 
-               limits = as.Date(c("2019-06-01", "2027-03-31"))) +
+               limits = as.Date(c("2019-01-01", "2027-12-31"))) +
   
   scale_y_continuous(name = element_blank(),
                      labels = function(y)  scales::percent(y, big.mark = ",", decimal.mark =".", accuracy = 0.1), 
@@ -312,13 +348,38 @@ overview_chart_waiting_times <-
   )+
   
   geom_line(aes(color = priority_eng))+
+  
+  geom_text(
+    data = \(d) d |>
+      group_by(type, priority_eng) |>
+      filter(date %in% range(date)) |>
+      mutate(
+        label_date = if_else(
+          date == min(date),
+          date - lubridate::days(60),
+          date + lubridate::days(60)
+        ),
+        hjust_label = if_else(date == min(date), 1, 0)
+      ) |>
+      ungroup(),
+    
+    aes(
+      x = label_date,
+      y = mean_wait,
+      color = priority_eng,
+      label = scales::number(mean_wait, accuracy = 0.1),
+      hjust = hjust_label
+    ),
+    show.legend = FALSE
+  )+
+  
   theme_minimal()+
   scale_color_manual(
     values = c("#cd403b", "#748394", "#12989c" ), 
     name = element_blank())+
   
   scale_x_date(name = element_blank(), breaks = "2 years", date_labels = "%b\n%Y", 
-               limits = as.Date(c("2019-06-01", "2027-03-31"))) +
+               limits = as.Date(c("2019-01-01", "2027-12-31"))) +
   
   scale_y_continuous(name = "Days",
                      limits = c(NA, NA)
@@ -353,7 +414,6 @@ overview_chart_waiting_times <-
 # A rising ratio toward 1 signals less relative differentiation, not
 # necessarily deterioration in absolute urgency advantage.
 
-(
   overview_chart_priority_erosion <-
     waiting_times_monthly %>%
     
@@ -410,17 +470,41 @@ overview_chart_waiting_times <-
       linewidth = 0.8
     ) +
     
+    geom_text(
+      data = \(d) d |>
+        group_by(type) |>
+        filter(date %in% range(date)) |>
+        mutate(
+          label_date = if_else(
+            date == min(date),
+            date - lubridate::days(60),
+            date + lubridate::days(60)
+          ),
+          hjust_label = if_else(date == min(date), 1, 0)
+        ) |>
+        ungroup(),
+      
+      aes(
+        x = label_date,
+        y = ratio,
+        # color = priority_eng,
+        label = scales::percent(ratio, accuracy = 0.1),
+        hjust = hjust_label
+      ),
+      show.legend = FALSE
+    )+
+    
     theme_minimal() +
     
     scale_x_date(
       name = element_blank(),
       breaks = "2 years",
       date_labels = "%b\n%Y",
-      limits = as.Date(c("2019-06-01", "2027-03-31"))
+      limits = as.Date(c("2019-01-01", "2027-12-31"))
     ) +
     
     scale_y_continuous(
-      name = "Waiting time ratio",
+      name = "Waiting time ratio\n(Urgent / Routine)",
       labels = scales::label_number(accuracy = 0.01),
       limits = c(0, NA)
     ) +
@@ -458,7 +542,6 @@ overview_chart_waiting_times <-
       subtitle = "Ratio of urgent to routine realized waiting times, Slovenia, 2020–2026",
       caption = "Source: The National Institute of Public Health (NIJZ), 2026.\nVisualization: Dr. Marko Ogorevc (IER, DZIIZ)"
     )
-)
 
 
 # 2.5 Chart: routine minus urgent gap in days ---------------------------------
@@ -517,13 +600,38 @@ overview_chart_waiting_times <-
       linewidth = 0.8
     ) +
     
+    
+    geom_text(
+      data = \(d) d |>
+        group_by(type) |>
+        filter(date %in% range(date)) |>
+        mutate(
+          label_date = if_else(
+            date == min(date),
+            date - lubridate::days(60),
+            date + lubridate::days(60)
+          ),
+          hjust_label = if_else(date == min(date), 1, 0)
+        ) |>
+        ungroup(),
+      
+      aes(
+        x = label_date,
+        y = gap,
+        label = scales::number(gap, accuracy = 0.1),
+        hjust = hjust_label
+      ),
+      color = "#cd403b",
+      show.legend = FALSE
+    )+
+    
     theme_minimal() +
     
     scale_x_date(
       name = element_blank(),
       breaks = "2 years",
       date_labels = "%b\n%Y",
-      limits = as.Date(c("2019-06-01", "2027-03-31"))
+      limits = as.Date(c("2019-01-01", "2027-12-31"))
     ) +
     
     scale_y_continuous(
@@ -652,6 +760,31 @@ overview_chart_first_appointment <-
       linewidth = 0.8
     ) +
     
+    geom_text(
+      data = \(d) d |>
+        group_by(type, priority_eng) |>
+        filter(date %in% range(date)) |>
+        mutate(
+          label_date = if_else(
+            date == min(date),
+            date - lubridate::days(60),
+            date + lubridate::days(60)
+          ),
+          hjust_label = if_else(date == min(date), 1, 0)
+        ) |>
+        ungroup(),
+      
+      aes(
+        x = label_date,
+        y = mean_wait,
+        label = scales::number(mean_wait, accuracy = 0.1),
+        hjust = hjust_label, 
+        color = priority_eng
+      ),
+     
+      show.legend = FALSE
+    )+
+    
     theme_minimal() +
     
     scale_color_manual(
@@ -663,7 +796,7 @@ overview_chart_first_appointment <-
       name = element_blank(),
       breaks = "2 years",
       date_labels = "%b\n%Y",
-      limits = as.Date(c("2019-06-01", "2027-03-31"))
+      limits = as.Date(c("2019-01-01", "2027-12-31"))
     ) +
     
     scale_y_continuous(
@@ -672,8 +805,7 @@ overview_chart_first_appointment <-
     ) +
     
     facet_wrap(
-      vars(type),
-      scales = "free_y"
+      vars(type)
     ) +
     
     theme(
@@ -770,6 +902,32 @@ overview_chart_first_appointment <-
       linewidth = 0.8
     ) +
     
+    geom_text(
+      data = \(d) d |>
+        group_by(type, indicator) |>
+        filter(date %in% range(date)) |>
+        mutate(
+          label_date = if_else(
+            date == min(date),
+            date - lubridate::days(60),
+            date + lubridate::days(60)
+          ),
+          hjust_label = if_else(date == min(date), 1, 0)
+        ) |>
+        ungroup(),
+      
+      aes(
+        x = label_date,
+        y = mean_wait,
+        label = scales::number(mean_wait, accuracy = 0.1),
+        hjust = hjust_label, 
+        color = indicator
+        ),
+      
+      
+      show.legend = FALSE
+    )+
+    
     theme_minimal() +
     
     scale_color_manual(
@@ -781,7 +939,7 @@ overview_chart_first_appointment <-
       name = element_blank(),
       breaks = "2 years",
       date_labels = "%b\n%Y",
-      limits = as.Date(c("2019-06-01", "2027-03-31"))
+      limits = as.Date(c("2019-01-01", "2027-12-31"))
     ) +
     
     scale_y_continuous(
