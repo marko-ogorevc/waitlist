@@ -124,6 +124,32 @@ Dynamic scores and capacity allocation offer **decision-support approaches**.
 These sources do not establish that rising urgency shares cause priority erosion. Curtis discusses wide clinical discretion; Johar identifies effects of guidelines with inconsistent alignment to recommendations; Déry reviews 48 studies covering 34 prioritization tools and finds inconclusive waiting-time effects. Powers' dynamic scoring evidence is simulation-based; van der Vlugt uses optimization and simulation for scheduling. Our distinction and longitudinal ratio measure are operational definitions in this study, not a validated clinical triage score.
 :::
 
+## Data quality | Digital records need validation
+
+```{r}
+#| label: fig-wait-quality
+#| fig-width: 10.5
+#| fig-height: 3.5
+#| out-width: "100%"
+#| fig-align: center
+overview_chart_wait_quality +
+  theme(
+    plot.title = element_text(size = 14),
+    plot.subtitle = element_text(size = 10),
+    plot.caption = element_text(size = 8),
+    axis.text = element_text(size = 10),
+    legend.text = element_text(size = 10)
+  )
+```
+
+<small>**Negative:** `r sum(waiting_quality_overall$n_records[waiting_quality_overall$wait_class == "Negative"])` records · **Zero:** `r sum(waiting_quality_overall$n_records[waiting_quality_overall$wait_class == "Zero"])` · **Mean between 0 and 1 day:** `r sum(waiting_quality_overall$n_records[waiting_quality_overall$wait_class == "Between 0 and 1 day"])`.</small>
+
+<small>Negative durations are invalid. Zero and short waits may be legitimate. **These are aggregated records, not individual patients.** Our principal ratio models exclude zero and negative means.</small>
+
+::: notes
+These are provider–VZS–month–priority aggregated means, not individual patient observations. Different records cover different completion volumes. The R quality audit also summarizes weighted completion counts and breaks the results down by urgency and reporting year. Excluding zero-duration group means may remove genuinely immediate care and could bias priority differentiation. Further sensitivity checks are warranted.
+:::
+
 ## Study design \| Slovenia, 2020–2026
 
 - National NIJZ administrative reporting; first specialist consultations, diagnostic and therapeutic procedures.
