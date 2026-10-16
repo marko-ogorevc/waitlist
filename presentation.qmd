@@ -40,7 +40,7 @@ library(tidyr)
 
 ## Digital records are not the same as managed access
 
-::: {.columns}
+::::: columns
 ::: {.column width="48%"}
 ### We can measure
 
@@ -48,6 +48,7 @@ library(tidyr)
 - How long completed services took
 - Which urgency category was recorded
 :::
+
 ::: {.column width="48%"}
 ### Can we also respond?
 
@@ -55,17 +56,17 @@ library(tidyr)
 - Identify weakening differentiation
 - Connect demand, capacity and decisions
 :::
-:::
+:::::
 
 **The next step is turning waiting-list data into actionable signals.**
 
-::: {.notes}
+::: notes
 Introduce the distinction between the infrastructure for reporting and the governance capacity to act on what the data reveal.
 :::
 
 ## Two different phenomena
 
-::: {.columns}
+::::: columns
 ::: {.column width="48%"}
 ### Priority inflation
 
@@ -73,6 +74,7 @@ A rising **share classified as highest urgency**.
 
 This concerns the *composition* of waiting-list entries or registrations.
 :::
+
 ::: {.column width="48%"}
 ### Priority erosion
 
@@ -80,16 +82,17 @@ A declining **relative waiting-time advantage** of higher-priority patients.
 
 This concerns the *observed differentiation* of access.
 :::
-:::
+:::::
+
 **One does not, by itself, prove the other.**
 
-::: {.notes}
+::: notes
 Keep these constructs separate. Changes in assignment quality cannot be inferred from administrative urgency shares alone.
 :::
 
 ## What does the literature tell us?
 
-::: {.columns}
+:::::: columns
 ::: {.column width="33%"}
 ### Assigning priority
 
@@ -97,6 +100,7 @@ Broad urgency categories permit **clinical discretion and variation**.
 
 <small>Curtis et al., 2010; Johar, 2014</small>
 :::
+
 ::: {.column width="33%"}
 ### Making it transparent
 
@@ -104,6 +108,7 @@ Prioritization tools can improve **transparency and consistency**; evidence of s
 
 <small>Déry et al., 2020</small>
 :::
+
 ::: {.column width="33%"}
 ### Managing dynamically
 
@@ -111,15 +116,15 @@ Dynamic scores and capacity allocation offer **decision-support approaches**.
 
 <small>Powers et al., 2023; van der Vlugt et al., 2024</small>
 :::
-:::
+::::::
 
 **Our contribution:** track whether urgency groups retain their **observed relative waiting-time differentiation**.
 
-::: {.notes}
+::: notes
 These sources do not establish that rising urgency shares cause priority erosion. Curtis discusses wide clinical discretion; Johar identifies effects of guidelines with inconsistent alignment to recommendations; Déry reviews 48 studies covering 34 prioritization tools and finds inconclusive waiting-time effects. Powers' dynamic scoring evidence is simulation-based; van der Vlugt uses optimization and simulation for scheduling. Our distinction and longitudinal ratio measure are operational definitions in this study, not a validated clinical triage score.
 :::
 
-## Study design | Slovenia, 2020–2026
+## Study design \| Slovenia, 2020–2026
 
 - National NIJZ administrative reporting; first specialist consultations, diagnostic and therapeutic procedures.
 - Monthly waiting-list stocks, new registrations, completed services and realized waiting times.
@@ -129,11 +134,11 @@ These sources do not establish that rising urgency shares cause priority erosion
 
 <small>Physiotherapy excluded because changes in electronic referral coverage may distort trends. Realized means are weighted by completed services.</small>
 
-::: {.notes}
+::: notes
 Missing and zero waiting-time observations, administrative coding changes and selection of high-volume cells constrain interpretation.
 :::
 
-## Result 1 | The priority mix is changing
+## Result 1 \| The priority mix is changing
 
 ```{r}
 #| label: fig-priority-stock
@@ -149,13 +154,13 @@ overview_chart_wait_all + theme(
 )
 ```
 
-::: {.notes}
+::: notes
 Waiting-list shares reflect stock, which depends on both entries and departures; it is not a direct clinical triage measure.
 :::
 
 ## Priority inflation is widespread across services
 
-::: {.columns}
+::::: columns
 ::: {.column width="38%"}
 ### 715 / 769
 
@@ -163,6 +168,7 @@ Waiting-list shares reflect stock, which depends on both entries and departures;
 
 At provider–VZS level: **3,001 / 3,416 (87.9%)** increased.
 :::
+
 ::: {.column width="62%"}
 ```{r}
 #| label: fig-priority-distribution
@@ -177,9 +183,9 @@ priority_inflation_distribution + theme(
 )
 ```
 :::
-:::
+:::::
 
-::: {.notes}
+::: notes
 Jan–Sep comparison, at least six valid months in each year. Separate priority inflation in waiting stocks from the classification of new referrals.
 :::
 
@@ -198,11 +204,11 @@ overview_chart_waiting_times + theme(
 )
 ```
 
-::: {.notes}
+::: notes
 These are weighted realized waits among completed services; changes in case mix and reporting can affect them.
 :::
 
-## Result 2 | Relative differentiation is declining
+## Result 2 \| Relative differentiation is declining
 
 ```{r}
 #| label: fig-paired-ratios
@@ -226,15 +232,15 @@ quarterly_summary |>
   theme(legend.position = "bottom", axis.text.x = element_text(size = 12))
 ```
 
-**126 matched provider–VZS combinations.** All three paired changes: **p < 0.001**.
+**126 matched provider–health service combinations.** All three paired changes: **p \< 0.001**.
 
-::: {.notes}
+::: notes
 At least 50 completions in each compared urgency per included quarter, with at least two valid quarters in each comparison year. Larger ratios signal weaker proportional differentiation.
 :::
 
 ## Relative versus absolute advantage
 
-::: {.columns}
+::::: columns
 ::: {.column width="50%"}
 ### Relative erosion
 
@@ -244,6 +250,7 @@ Median ratios rose:
 - Urgent / Semi-urgent: **0.279 → 0.393**
 - Semi-urgent / Routine: **0.644 → 0.734**
 :::
+
 ::: {.column width="50%"}
 ### Absolute gaps behave differently
 
@@ -253,15 +260,15 @@ Median paired changes:
 - Urgent / Semi-urgent: **+16.0 days**
 - Semi-urgent / Routine: **−1.16 days**
 :::
-:::
+:::::
 
 **A smaller proportional advantage can coexist with a larger gap in days.**
 
-::: {.notes}
+::: notes
 A ratio close to one indicates less relative differentiation, but not necessarily worse clinical triage or smaller absolute differences.
 :::
 
-## Result 3 | Short-term dynamics tell a different story
+## Result 3 \| Short-term dynamics tell a different story
 
 ```{r}
 #| label: fig-model-coefficients
@@ -284,13 +291,13 @@ tibble::tibble(
   theme_minimal(base_size = 15)
 ```
 
-**8,759 quarterly observations**, provider–VZS and quarter fixed effects.
+**8,759 quarterly observations**, provider–health service and quarter fixed effects.
 
-::: {.notes}
-Negative ratio association (beta −0.0151, p < .001) decomposes into urgent −0.0036 (p < .01) and routine +0.0115 (p < .001). These are associations, not effects of changing triage policy.
+::: notes
+Negative ratio association (beta −0.0151, p \< .001) decomposes into urgent −0.0036 (p \< .01) and routine +0.0115 (p \< .001). These are associations, not effects of changing triage policy.
 :::
 
-## Panel estimates | Specification checks {.smaller}
+## Panel estimates \| Specification checks {.smaller}
 
 ```{r}
 #| label: tbl-panel-specifications
@@ -334,20 +341,21 @@ knitr::kable(panel_table, format = "html", escape = FALSE,
              table.attr = 'class="panel-regression"')
 ```
 
-<small>Clustered standard errors in parentheses; * p < .05, ** p < .01, *** p < .001. Controls are a sensitivity specification, not a causal model.</small>
+<small>Clustered standard errors in parentheses; \* p \< .05, \*\* p \< .01, \*\*\* p \< .001. Controls are a sensitivity specification, not a causal model.</small>
 
-::: {.notes}
+::: notes
 Point out that the lagged share predicts the ratio by itself but provides little incremental information when the concurrent share is included. The coefficient on current share is stable after controlling for registered and completed volumes. These associations are not proof of reallocation of services or causal effects.
 :::
 
 ## How can both findings be true?
 
-::: {.columns}
+::::: columns
 ::: {.column width="48%"}
 ### Over six years
 
 Matched provider–service pairs show **less relative differentiation** across all three priority comparisons.
 :::
+
 ::: {.column width="48%"}
 ### Within quarters
 
@@ -355,19 +363,19 @@ A higher *current* urgent-registration share is associated with a **lower urgent
 
 Lagged share adds little once the current share is included.
 :::
-:::
+:::::
 
 **Long-term trends and within-provider associations are different questions.**
 
 <small>Administrative data cannot establish that priority inflation causes priority erosion.</small>
 
-::: {.notes}
+::: notes
 Avoid causal language. Concurrent demand changes, realized service selection and changes in reported waiting-time composition can produce associations.
 :::
 
 ## From indicators to decisions
 
-::: {.columns}
+:::::: columns
 ::: {.column width="32%"}
 ### Detect
 
@@ -375,6 +383,7 @@ Avoid causal language. Concurrent demand changes, realized service selection and
 - Ratio trends by provider and service
 - Anomalous flows and data quality
 :::
+
 ::: {.column width="32%"}
 ### Diagnose
 
@@ -382,6 +391,7 @@ Avoid causal language. Concurrent demand changes, realized service selection and
 - Capacity, arrivals and completions
 - Clinical review of priority coding
 :::
+
 ::: {.column width="32%"}
 ### Act and evaluate
 
@@ -389,34 +399,34 @@ Avoid causal language. Concurrent demand changes, realized service selection and
 - Test targeted operational changes
 - Monitor access outcomes
 :::
-:::
+::::::
 
 **An active access-management cycle: measure → investigate → intervene → learn.**
 
-::: {.notes}
+::: notes
 Future phase: scenario simulation or digital twins when data quality, governance and model validation justify them.
 :::
 
-## Conclusions | Beyond digitalization
+## Conclusions \| Beyond digitalization
 
-1. **Priority inflation** is widespread in waiting-list stocks.
-2. **Relative waiting-time differentiation** weakened across matched provider–service pairs; this does not imply that absolute gaps always narrowed.
-3. **Short-term dynamics** differ from long-run trends. No causal link between the two phenomena is established.
+1.  **Priority inflation** is widespread in waiting-list stocks.
+2.  **Relative waiting-time differentiation** weakened across matched provider–service pairs; this does not imply that absolute gaps always narrowed.
+3.  **Short-term dynamics** differ from long-run trends. No causal link between the two phenomena is established.
 
 **The goal is to move from passive reporting to evidence-informed access management.**
 
-::: {.notes}
+::: notes
 Limitations: selection of higher-volume provider–VZS cells, reporting changes, zero-wait exclusion, case mix and simultaneity. The study motivates monitored action rather than proving inappropriate triage.
 :::
 
 ## Selected references {.smaller}
 
 - Curtis, A. J., Russell, C. O. H., Stoelwinder, J. U., & McNeil, J. J. (2010). Waiting lists and elective surgery: Ordering the queue. *Medical Journal of Australia, 192*(4), 217–220.
-- Johar, M. (2014). *Are waiting list prioritisation guidelines being followed in Australia?* Research manuscript supplied in the literature archive. 
+- Johar, M. (2014). *Are waiting list prioritisation guidelines being followed in Australia?* Research manuscript supplied in the literature archive.
 - Déry, J., et al. (2020). A systematic review of patient prioritization tools in non-emergency healthcare services. *Systematic Reviews, 9*, 227. https://doi.org/10.1186/s13643-020-01482-8
 - Powers, J., et al. (2023). Managing surgical waiting lists through dynamic priority scoring. *Health Care Management Science, 26*, 533–557. https://doi.org/10.1007/s10729-023-09648-1
 - van der Vlugt, Y. M., van Essen, J. T., Vromans, R. F. M., & Carlier, M. (2024). *Timeslot allocation for waiting list control*. arXiv:2410.10221.
 
-::: {.notes}
+::: notes
 References supplied in the literature archive. Reference details are provided for further reading; some were available as manuscript/preprint copies rather than final journal versions. The empirical study does not establish causal prioritization effects.
 :::
