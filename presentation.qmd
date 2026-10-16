@@ -8,6 +8,7 @@ institute: "Institute for Economic Research, Ljubljana, Slovenia"
 format:
   revealjs:
     theme: [default, styles.scss]
+    embed-resources: true
     slide-number: true
     progress: true
     transition: fade
