@@ -290,6 +290,56 @@ tibble::tibble(
 Negative ratio association (beta −0.0151, p < .001) decomposes into urgent −0.0036 (p < .01) and routine +0.0115 (p < .001). These are associations, not effects of changing triage policy.
 :::
 
+## Panel estimates | Specification checks {.smaller}
+
+```{r}
+#| label: tbl-panel-specifications
+#| results: asis
+#| tbl-cap: "Quarterly provider–VZS fixed-effects models; outcome: log(Urgent / Routine realized wait)."
+# Dynamically read the estimates from the locally fitted fixest models.
+# Every model is estimated on the identical lag-available sample.
+models_for_slide <- list(
+  "Current" = model_current,
+  "Lagged" = model_lagged,
+  "Both" = model_combined,
+  "Controls" = model_extended
+)
+coef_labels <- c(
+  share_new_pp = "Urgent share (t), pp",
+  share_new_lag1_pp = "Urgent share (t−1), pp",
+  log_new = "Log(new registrations + 1)",
+  log_realized = "Log(completions + 1)"
+)
+fmt_coef <- function(model, term) {
+  est <- coef(model)
+  if (!term %in% names(est)) return("—")
+  ct <- summary(model)$coeftable
+  p <- ct[term, "Pr(>|t|)"]
+  stars <- if (p < .001) "***" else if (p < .01) "**" else if (p < .05) "*" else ""
+  sprintf("%.4f%s (%.4f)", est[[term]], stars, ct[term, "Std. Error"])
+}
+table_rows <- lapply(names(coef_labels), function(term) {
+  c(coef_labels[[term]], vapply(models_for_slide, fmt_coef, character(1), term = term))
+})
+table_rows <- c(table_rows, list(
+  c("Provider–VZS FE", rep("Yes", 4)),
+  c("Quarter FE", rep("Yes", 4)),
+  c("Observations", vapply(models_for_slide, function(m) format(stats::nobs(m), big.mark = ","), character(1))),
+  c("Within R²", vapply(models_for_slide, function(m) sprintf("%.4f", fixest::fitstat(m, "wr2")[[1]]), character(1)))
+))
+panel_table <- as.data.frame(do.call(rbind, table_rows), stringsAsFactors = FALSE)
+names(panel_table) <- c("Term", names(models_for_slide))
+knitr::kable(panel_table, format = "html", escape = FALSE,
+             align = c("l", rep("c", 4)),
+             table.attr = 'class="panel-regression"')
+```
+
+<small>Clustered standard errors in parentheses; * p < .05, ** p < .01, *** p < .001. Controls are a sensitivity specification, not a causal model.</small>
+
+::: {.notes}
+Point out that the lagged share predicts the ratio by itself but provides little incremental information when the concurrent share is included. The coefficient on current share is stable after controlling for registered and completed volumes. These associations are not proof of reallocation of services or causal effects.
+:::
+
 ## How can both findings be true?
 
 ::: {.columns}
