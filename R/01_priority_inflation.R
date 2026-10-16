@@ -268,41 +268,107 @@ waiting_times <- priority_data |>
   )
 
 
-# 2.1 Data-quality check: negative and zero realized waiting times ------------
-# Negative durations are invalid. Zero durations can be legitimate, but this
-# exploratory analysis excludes both and should be checked for sensitivity.
-waiting_times |>
-  summarise(
-    n_negative = sum(`ČD realizirana` < 0, na.rm = TRUE),
-    n_zero = sum(`ČD realizirana` == 0, na.rm = TRUE),
-    min_wait = min(`ČD realizirana`, na.rm = TRUE),
-    realized_negative = sum(
-      Realizirani[`ČD realizirana` < 0],
-      na.rm = TRUE
+# 2.1 QUALITY AUDIT: REALIZED WAITING TIMES ----------------------------------
+# A record is a provider × VZS × month × urgency aggregated mean (not a patient).
+# Negative realized mean = logically invalid; zero and 0 < wait < 1 day may
+# be legitimate. A very short group MEAN does not mean all patients waited
+# less than one day. Missing is not interchangeable with zero.
+# Main models below retain ONLY strictly positive means and completions > 0.
+# Tables also show completed-service weights; counts are not unique patients.
+
+waiting_time_quality <- waiting_times |>
+  mutate(
+    year = lubridate::year(date),
+    valid_volume = !is.na(Realizirani) & is.finite(Realizirani) & Realizirani > 0,
+    wait_class = case_when(
+      is.na(`ČD realizirana`) ~ "Missing",
+      !is.finite(`ČD realizirana`) ~ "Non-finite",
+      `ČD realizirana` < 0 ~ "Negative",
+      `ČD realizirana` == 0 ~ "Zero",
+      `ČD realizirana` < 1 ~ "Between 0 and 1 day",
+      `ČD realizirana` < 7 ~ "1 to under 7 days",
+      TRUE ~ "7 days or more"
+    ),
+    wait_class = factor(
+      wait_class,
+      levels = c("Negative", "Zero", "Between 0 and 1 day",
+                 "1 to under 7 days", "7 days or more",
+                 "Missing", "Non-finite")
     )
   )
 
-waiting_times |>
-  filter(`ČD realizirana` <= 0) |>
-  mutate(
-    year = lubridate::year(date),
-    status = if_else(
-      `ČD realizirana` < 0,
-      "Negativna",
-      "Ničelna"
-    )
-  ) |>
-  group_by(year, priority, status) |>
+# Count records regardless of completion reporting; count completions only
+# where volume is valid. Invalid volume is flagged rather than used as weight.
+waiting_quality_overall <- waiting_time_quality |>
+  group_by(wait_class) |>
   summarise(
-    n = n(),
-    realized = sum(Realizirani, na.rm = TRUE),
+    n_records = n(),
+    n_valid_volume_records = sum(valid_volume),
+    n_completions = sum(Realizirani[valid_volume]),
+    n_missing_or_invalid_volume = sum(!valid_volume),
     .groups = "drop"
-  ) |> 
-  ggplot(
-    aes( 
-      x = year, y = n)
-  )+
-  geom_line(aes(color = status, lty = priority))
+  )
+
+waiting_quality_year <- waiting_time_quality |>
+  group_by(year, wait_class) |>
+  summarise(
+    n_records = n(),
+    n_completions = sum(Realizirani[valid_volume]),
+    .groups = "drop"
+  )
+
+waiting_quality_priority <- waiting_time_quality |>
+  filter(valid_volume) |>
+  group_by(priority, wait_class) |>
+  summarise(
+    n_records = n(),
+    n_completions = sum(Realizirani),
+    .groups = "drop"
+  ) |>
+  group_by(priority) |>
+  mutate(
+    pct_records = 100 * n_records / sum(n_records),
+    pct_completions = 100 * n_completions / sum(n_completions)
+  ) |>
+  ungroup()
+
+# Optional inspection of logically impossible records, excluding details
+# from published presentations to avoid disclosing provider-level reporting.
+waiting_quality_negative <- waiting_time_quality |>
+  filter(wait_class == "Negative") |>
+  summarise(
+    n_records = n(),
+    min_wait = if (n() > 0) min(`ČD realizirana`) else NA_real_,
+    n_completions = sum(Realizirani[valid_volume])
+  )
+
+print(waiting_quality_overall)
+print(waiting_quality_negative)
+print(waiting_quality_priority)
+
+# 2.1a Visual diagnostic by reporting year (counts, not patient counts).
+overview_chart_wait_quality <- waiting_quality_year |>
+  filter(wait_class %in% c("Negative", "Zero", "Between 0 and 1 day")) |>
+  ggplot(aes(x = factor(year), y = n_records, fill = wait_class)) +
+  geom_col(position = position_dodge(width = 0.75), width = 0.7) +
+  scale_fill_manual(
+    values = c("Negative" = "#cd403b",
+               "Zero" = "#748394",
+               "Between 0 and 1 day" = "#12989c"),
+    drop = FALSE
+  ) +
+  labs(
+    x = "Year", y = "Provider–service–month–priority records",
+    fill = NULL,
+    title = "Data Quality: Implausible and Short Realized Waiting Times",
+    subtitle = "Reported mean waiting times per provider, VZS, month and priority",
+    caption = "Source: NIJZ. Zero and short waits can be valid; negative waits are invalid."
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "bottom")
+
+# Sensitivity to zero waits should be tested separately: ratios and log(wait)
+# cannot include a zero numerator or denominator without redefining outcome.
 
 
 # 2.2 Weighted monthly means --------------------------------------------------
