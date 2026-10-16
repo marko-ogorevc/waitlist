@@ -86,6 +86,38 @@ This concerns the *observed differentiation* of access.
 Keep these constructs separate. Changes in assignment quality cannot be inferred from administrative urgency shares alone.
 :::
 
+## What does the literature tell us?
+
+::: {.columns}
+::: {.column width="33%"}
+### Assigning priority
+
+Broad urgency categories permit **clinical discretion and variation**.
+
+<small>Curtis et al., 2010; Johar, 2014</small>
+:::
+::: {.column width="33%"}
+### Making it transparent
+
+Prioritization tools can improve **transparency and consistency**; evidence of shorter waits remains mixed.
+
+<small>Déry et al., 2020</small>
+:::
+::: {.column width="33%"}
+### Managing dynamically
+
+Dynamic scores and capacity allocation offer **decision-support approaches**.
+
+<small>Powers et al., 2023; van der Vlugt et al., 2024</small>
+:::
+:::
+
+**Our contribution:** track whether urgency groups retain their **observed relative waiting-time differentiation**.
+
+::: {.notes}
+These sources do not establish that rising urgency shares cause priority erosion. Curtis discusses wide clinical discretion; Johar identifies effects of guidelines with inconsistent alignment to recommendations; Déry reviews 48 studies covering 34 prioritization tools and finds inconclusive waiting-time effects. Powers' dynamic scoring evidence is simulation-based; van der Vlugt uses optimization and simulation for scheduling. Our distinction and longitudinal ratio measure are operational definitions in this study, not a validated clinical triage score.
+:::
+
 ## Study design | Slovenia, 2020–2026
 
 - National NIJZ administrative reporting; first specialist consultations, diagnostic and therapeutic procedures.
@@ -324,4 +356,16 @@ Future phase: scenario simulation or digital twins when data quality, governance
 
 ::: {.notes}
 Limitations: selection of higher-volume provider–VZS cells, reporting changes, zero-wait exclusion, case mix and simultaneity. The study motivates monitored action rather than proving inappropriate triage.
+:::
+
+## Selected references {.smaller}
+
+- Curtis, A. J., Russell, C. O. H., Stoelwinder, J. U., & McNeil, J. J. (2010). Waiting lists and elective surgery: Ordering the queue. *Medical Journal of Australia, 192*(4), 217–220.
+- Johar, M. (2014). Are waiting list prioritisation guidelines being followed in Australia? *Medical Decision Making*. 
+- Déry, J., et al. (2020). A systematic review of patient prioritization tools in non-emergency healthcare services. *Systematic Reviews, 9*, 227. https://doi.org/10.1186/s13643-020-01482-8
+- Powers, J., et al. (2023). Managing surgical waiting lists through dynamic priority scoring. *Health Care Management Science, 26*, 533–557. https://doi.org/10.1007/s10729-023-09648-1
+- van der Vlugt, Y. M., van Essen, J. T., Vromans, R. F. M., & Carlier, M. (2024). *Timeslot allocation for waiting list control*. arXiv:2410.10221.
+
+::: {.notes}
+References supplied in the literature archive. Reference details are provided for further reading; some were available as manuscript/preprint copies rather than final journal versions. The empirical study does not establish causal prioritization effects.
 :::
