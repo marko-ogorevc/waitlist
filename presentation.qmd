@@ -124,7 +124,7 @@ Dynamic scores and capacity allocation offer **decision-support approaches**.
 These sources do not establish that rising urgency shares cause priority erosion. Curtis discusses wide clinical discretion; Johar identifies effects of guidelines with inconsistent alignment to recommendations; Déry reviews 48 studies covering 34 prioritization tools and finds inconclusive waiting-time effects. Powers' dynamic scoring evidence is simulation-based; van der Vlugt uses optimization and simulation for scheduling. Our distinction and longitudinal ratio measure are operational definitions in this study, not a validated clinical triage score.
 :::
 
-## Data quality | Digital records need validation
+## Data quality \| Digital records need validation
 
 ```{r}
 #| label: fig-wait-quality
@@ -147,14 +147,14 @@ overview_chart_wait_quality +
 <small>Negative durations are invalid. Zero and short waits may be legitimate. **These are aggregated records, not individual patients.** Our principal ratio models exclude zero and negative means.</small>
 
 ::: notes
-These are provider–VZS–month–priority aggregated means, not individual patient observations. Different records cover different completion volumes. The R quality audit also summarizes weighted completion counts and breaks the results down by urgency and reporting year. Excluding zero-duration group means may remove genuinely immediate care and could bias priority differentiation. Further sensitivity checks are warranted.
+These are provider–health service–month–priority aggregated means, not individual patient observations. Different records cover different completion volumes. The R quality audit also summarizes weighted completion counts and breaks the results down by urgency and reporting year. Excluding zero-duration group means may remove genuinely immediate care and could bias priority differentiation. Further sensitivity checks are warranted.
 :::
 
 ## Study design \| Slovenia, 2020–2026
 
 - National NIJZ administrative reporting; first specialist consultations, diagnostic and therapeutic procedures.
 - Monthly waiting-list stocks, new registrations, completed services and realized waiting times.
-- Matched **provider × service (VZS)** comparisons: Jan–Sep 2020 versus Jan–Sep 2026.
+- Matched **provider × health service** comparisons: Jan–Sep 2020 versus Jan–Sep 2026.
 - Robustness: at least **10 per priority per month** or **50 per priority per quarter**; common matched samples.
 - Quarterly provider–VZS and calendar-quarter fixed effects; standard errors clustered by provider–VZS.
 
@@ -442,7 +442,7 @@ Future phase: scenario simulation or digital twins when data quality, governance
 **The goal is to move from passive reporting to evidence-informed access management.**
 
 ::: notes
-Limitations: selection of higher-volume provider–VZS cells, reporting changes, zero-wait exclusion, case mix and simultaneity. The study motivates monitored action rather than proving inappropriate triage.
+Limitations: selection of higher-volume provider–service cells, reporting changes, zero-wait exclusion, case mix and simultaneity. The study motivates monitored action rather than proving inappropriate triage.
 :::
 
 ## Selected references {.smaller}
