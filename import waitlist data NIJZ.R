@@ -122,10 +122,6 @@ NIJZ_data_aug <- read_excel(
     -"VZS naziv"
   )
 
-# firstup <- function(x) {
-#   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
-#   x
-# }
 
 NIJZ_data_okt <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja september 2024-oktober 2024 po VZS in izvajalcih_ver6.xlsx")
@@ -138,8 +134,6 @@ NIJZ_data_okt <- read_excel(
   select(
     -"VZS naziv"
   )
-
-
 
 
 NIJZ_data_01 <- read_excel(
@@ -155,7 +149,6 @@ NIJZ_data_02 <- read_excel(
   select(
     -"VZS naziv"
   )
-
 
 NIJZ_data_okt <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja september 2024-oktober 2024 po VZS in izvajalcih_ver6.xlsx")
@@ -187,14 +180,12 @@ NIJZ_data_feb <- read_excel(
     -"VZS naziv"
   )
 
-
 NIJZ_data_april <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja marec in april 2025 po VZS in izvajalcih.xlsx")
 ) |> 
   select(
     -"VZS naziv"
   )
-
 
 NIJZ_maj_junij <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja maj in junij 2025 po VZS in izvajalcih.xlsx")
@@ -220,7 +211,6 @@ NIJZ_sept_oktober <- read_excel(
     NIJZ_maj_junij |> distinct(`RIZDDZ šifra izvajalca`, `Naziv izvajalca`) |> distinct(`RIZDDZ šifra izvajalca`, .keep_all = TRUE)
   )
 
-
 NIJZ_november_december <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja november in december 2025 po VZS in izvajalcih.xlsx")
 )|> 
@@ -234,7 +224,6 @@ NIJZ_januar_februar_2026 <- read_excel(
   left_join(
     NIJZ_maj_junij |> distinct(`RIZDDZ šifra izvajalca`, `Naziv izvajalca`) |> distinct(`RIZDDZ šifra izvajalca`, .keep_all = TRUE)
   )
-
 
 NIJZ_marec_april_2026 <- read_excel(
   str_c(root, "/NIJZ zahtevki cakajoci/Prikaz stanja marec in april 2026 po VZS in izvajalcih.xlsx")
@@ -361,6 +350,10 @@ NIJZ_db <-
     -c(contains("VZS"), contains("izvajalca"), "date", contains("tip", ignore.case = TRUE))
   ) 
 
+
+glimpse(NIJZ_db)
+
+
 nijz_var_prior<-
   NIJZ_db |> 
   distinct(name) |> 
@@ -385,9 +378,53 @@ nijz_var_prior<-
 
 NIJZ_db <-
   NIJZ_db |> 
-  left_join(nijz_var_prior) |> 
+  left_join(nijz_var_prior) 
+
+NIJZ_db <-
+  NIJZ_db |> 
   mutate(
-    `VZS naziv` = ifelse(is.na(`Naziv VZS`), `VZS naziv`, `Naziv VZS`)
+  TIP_VZS = case_when(
+    `Tip VZS po naročanju` == 1 ~ "Preventivni pregled",
+    
+    `Tip VZS po naročanju` == 2 &
+      `Tip kurativnega pregleda` == 1 ~ "Prvi pregled",
+    
+    `Tip VZS po naročanju` == 2 &
+      `Tip kurativnega pregleda` == 2 ~ "Kontrolni pregled",
+    
+    `Tip VZS po naročanju` == 2 &
+      `Tip kurativnega pregleda` == 3 ~ "Začetek zdravljenja",
+    
+    `Tip VZS po naročanju` == 2 &
+      `Tip kurativnega pregleda` == 4 ~ "Videopregled",
+    
+    `Tip VZS po naročanju` == 2 &
+      is.na(`Tip kurativnega pregleda`) ~ "Kurativni pregled - neopredeljen",
+    
+    `Tip VZS po naročanju` == 3 ~ "Diagnostični postopek",
+    `Tip VZS po naročanju` == 4 ~ "Terapevtski postopek",
+    `Tip VZS po naročanju` == 5 ~ "ePosvet",
+    `Tip VZS po naročanju` == 6 ~ "Nacionalni razpis",
+    `Tip VZS po naročanju` == 7 ~ "Patronaža",
+    
+    TRUE ~ "Drugo"
+  ) 
+  )|> 
+  
+  select(
+    "date",
+    "VZS šifra", 
+    "VZS naziv" = "Naziv VZS",
+    "TIP_VZS",
+    "RIZDDZ šifra izvajalca",
+    "var",
+    "priority",
+    "value"
   )
+
+
+NIJZ_db |>
+  distinct(`VZS šifra`, TIP_VZS) |>
+  count(TIP_VZS, sort = TRUE)
 
 
