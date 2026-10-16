@@ -64,32 +64,70 @@ execute:
 
 ## Data and methods
 
-- Slovenian national waiting-list data, **2020–2025** (as specified in the abstract).
-- Monthly time series by service (VZS) and urgency level.
-- Counts of waiting and realized patients; realized waiting times where comparable.
-- Descriptive trends followed by service-level panel analysis.
+- Slovenian national waiting-list data, **January 2020–September 2026** (extended empirical period).
+- Monthly reporting by provider × VZS × urgency, aggregated to months or quarters.
+- Waiting-list entries (stock), newly registered appointments (flow), completed services, and realized waiting times.
+- Matched provider–VZS comparisons (Jan–Sep 2020 vs. Jan–Sep 2026) and provider–VZS / calendar-quarter fixed-effects models.
 
 ::: {.callout-note}
-Analyses and denominators will be finalized after data validation. The existing import script also references 2026 files.
+Selected first consultations, diagnostic and therapeutic procedures; physiotherapy excluded. Waiting-list entries are not necessarily unique patients. Administrative reporting differences and patient-mix changes limit inference.
 :::
 
-## Results I: Changes in priority mix
+## Result 1: Widespread priority inflation
 
-**Figure placeholder:** Monthly share of patients in each urgency category.
+**715 of 769 comparable healthcare services (93.0%)** recorded a higher share of the highest urgency category on waiting lists in Jan–Sep 2026 than in Jan–Sep 2020.
 
-*Pending data validation and analysis.*
+- Required at least six positive-stock monthly observations in each comparison period.
+- At provider–VZS level, **3,001 of 3,416 matched combinations (87.9%)** increased.
+- These are *shares of waiting-list entries*, not proof of changes in clinical triage decisions.
 
-## Results II: Waiting-time differentiation
+## Result 2: Erosion of relative waiting-time differentiation
 
-**Figure placeholder:** Realized waiting times by urgency category and service.
+**Common matched sample: 126 provider–VZS combinations**, at least 50 completed services per compared urgency in at least two quarters of each Jan–Sep comparison period.
 
-*Pending data validation and analysis.*
+| Realized waiting-time ratio | Median 2020 | Median 2026 | Increased pairs |
+|:--|--:|--:|--:|
+| Semi-urgent / Routine | 0.644 | 0.734 | 72.2% |
+| Urgent / Routine | 0.171 | 0.283 | 81.0% |
+| Urgent / Semi-urgent | 0.279 | 0.393 | 73.0% |
 
-## Results III: Access performance
+All three paired Wilcoxon signed-rank tests **p < 0.001**.
 
-**Figure placeholder:** Waiting-time thresholds and overdue patients across categories.
+## Relative and absolute priority advantages are different
 
-*Pending data validation and analysis.*
+- Increasing priority ratios indicate **less relative differentiation** in realized waiting times.
+- Median changes in the absolute routine-minus-higher-priority gap, in the same quarterly sample:
+  - Semi-urgent / Routine: **−1.16 days**
+  - Urgent / Routine: **+14.9 days**
+  - Urgent / Semi-urgent: **+16.0 days**
+- Therefore, erosion of *relative* differentiation does not imply erosion of the absolute gap.
+
+## Result 3: Dynamic prioritization within providers
+
+Quarterly provider–VZS fixed-effects analysis, **8,759 observations**; provider–VZS and calendar-quarter effects, SE clustered by provider–VZS.
+
+| Outcome | Coefficient per 1 pp increase in new urgent share |
+|:--|--:|
+| log(Urgent / Routine realized wait) | **−0.0151*** |
+| log(Urgent realized wait) | **−0.0036** |
+| log(Routine realized wait) | **+0.0115*** |
+
+- Higher contemporaneous urgent registration shares are associated with **greater relative urgent advantage**, mainly through longer routine waits.
+- Associations persist in direction after adjusting for new registration and completion volumes; no causal interpretation.
+
+## Time alignment and interpretation
+
+- Lagged urgent share alone: **β = −0.0070**, p < 0.001.
+- With both current and lagged shares: current **β = −0.0146**, p < 0.001; lagged **β = −0.0011**, not statistically significant.
+- The longitudinal rise in waiting-time ratios and the *within-provider* contemporaneous negative association answer different questions.
+- No direct evidence here that priority inflation **caused** declining relative differentiation.
+
+## Methodological boundaries
+
+- Positive realized waits only; sensitivity to excluding legitimate zero waits remains to be assessed.
+- Provider-level reporting errors, urgency coding changes, and evolving case mix are not fully controlled.
+- High-volume matched panels describe a selected subset of services and providers.
+- Reported earliest/indicative appointment waits mix two definitions and are not interchangeable with realized waits.
 
 ## Beyond traditional indicators
 
@@ -116,7 +154,7 @@ Analyses and denominators will be finalized after data validation. The existing 
 
 **Digital maturity becomes valuable when it improves decisions about access.**
 
-The empirical study will assess whether changes in urgency assignment coincide with declining differentiation in realized waiting times.
+Matched provider–service comparisons show a decline in **relative** waiting-time differentiation across urgency categories. Within-provider short-term associations with new urgent registrations run in the opposite direction; causality remains unestablished.
 
 ## Thank you
 
