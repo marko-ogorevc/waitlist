@@ -1,0 +1,127 @@
+---
+title: "Beyond Digitalization"
+subtitle: "Priority Erosion and the Transition from Waiting Lists to Active Healthcare Access Management"
+author:
+  - "Marko Ogorevc"
+  - "Valentina Prevolnik Rupel"
+institute: "Institute for Economic Research, Ljubljana, Slovenia"
+format:
+  revealjs:
+    theme: [default, styles.scss]
+    slide-number: true
+    progress: true
+    transition: fade
+    center: false
+    width: 1280
+    height: 720
+    margin: 0.08
+    footer: "Healthcare access management | Research in progress"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## Why waiting lists matter
+
+- Waiting lists are a visible symptom of constrained healthcare access.
+- Digital systems improve recording and reporting.
+- The next step is **active, data-driven access management**.
+
+## From passive reporting to active management
+
+::: {.columns}
+::: {.column width="48%"}
+### Passive reporting
+
+- Number of patients waiting
+- Average waiting time
+- Compliance with statutory limits
+:::
+::: {.column width="48%"}
+### Active management
+
+- Changes in prioritization
+- Patient flows and capacity
+- Early warning indicators
+- Evaluation of interventions
+:::
+:::
+
+## Two related questions
+
+::: {.incremental}
+- **Priority inflation:** Is the share assigned to higher urgency categories rising?
+- **Priority erosion:** Does urgency classification lose its practical ability to differentiate access?
+- **Empirical distinction:** A changing priority mix alone does not establish erosion.
+:::
+
+## Research questions
+
+1. How did the urgency mix change across services and over time?
+2. Did differences in realized waiting times between urgency categories change?
+3. Do conventional aggregate indicators conceal these changes?
+
+## Data and methods
+
+- Slovenian national waiting-list data, **2020–2025** (as specified in the abstract).
+- Monthly time series by service (VZS) and urgency level.
+- Counts of waiting and realized patients; realized waiting times where comparable.
+- Descriptive trends followed by service-level panel analysis.
+
+::: {.callout-note}
+Analyses and denominators will be finalized after data validation. The existing import script also references 2026 files.
+:::
+
+## Results I: Changes in priority mix
+
+**Figure placeholder:** Monthly share of patients in each urgency category.
+
+*Pending data validation and analysis.*
+
+## Results II: Waiting-time differentiation
+
+**Figure placeholder:** Realized waiting times by urgency category and service.
+
+*Pending data validation and analysis.*
+
+## Results III: Access performance
+
+**Figure placeholder:** Waiting-time thresholds and overdue patients across categories.
+
+*Pending data validation and analysis.*
+
+## Beyond traditional indicators
+
+- Overall list size can change independently of the priority mix.
+- Average waiting time can conceal differences across urgency categories.
+- Monitoring must connect **prioritization, patient flows, and realized access**.
+
+## A conceptual digital maturity framework
+
+1. **Recording:** Standardized waiting-list registration
+2. **Monitoring:** Timely dashboards and data-quality controls
+3. **Detection:** Identification of emerging access risks
+4. **Decision support:** Evaluation of scenarios and interventions
+5. **Adaptive management:** Closed-loop learning, potentially supported by digital twins
+
+## Policy implications
+
+- Monitor urgency mix alongside realized access.
+- Compare services using consistent definitions and periods.
+- Build analytical and governance capabilities on centralized infrastructure.
+- Validate warning indicators before operational deployment.
+
+## Conclusions
+
+**Digital maturity becomes valuable when it improves decisions about access.**
+
+The empirical study will assess whether changes in urgency assignment coincide with declining differentiation in realized waiting times.
+
+## Thank you
+
+**Marko Ogorevc & Valentina Prevolnik Rupel**
+
+Institute for Economic Research, Ljubljana, Slovenia
+
+ogorevcm@ier.si
