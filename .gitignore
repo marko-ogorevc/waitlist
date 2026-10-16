@@ -1,0 +1,14 @@
+# Source data and derived data: keep local unless explicitly cleared for publication
+/data/
+/*.RData
+/.Rhistory
+/.Rproj.user/
+# Rendered Quarto files
+/.quarto/
+/_site/
+*_files/
+/presentation.html
+/presentation.pdf
+# System files
+.DS_Store
+Thumbs.db
