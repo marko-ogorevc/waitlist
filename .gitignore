@@ -12,3 +12,7 @@
 # System files
 .DS_Store
 Thumbs.db
+
+# Local analytical outputs: only publish deliberately reviewed aggregates
+/results/
+/figures/
